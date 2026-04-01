@@ -1,4 +1,4 @@
-module fibonacci_8bit (
+module fibonacci (
     input clk,
     output reg [7:0] fib
 );
