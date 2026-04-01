@@ -1,27 +1,54 @@
-/*
- * Copyright (c) 2024 Your Name
- * SPDX-License-Identifier: Apache-2.0
- */
-
-`default_nettype none
-
-module tt_um_example (
-    input  wire [7:0] ui_in,    // Dedicated inputs
-    output wire [7:0] uo_out,   // Dedicated outputs
-    input  wire [7:0] uio_in,   // IOs: Input path
-    output wire [7:0] uio_out,  // IOs: Output path
-    output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
-    input  wire       ena,      // always 1 when the design is powered, so you can ignore it
-    input  wire       clk,      // clock
-    input  wire       rst_n     // reset_n - low to reset
+module fibonacci_8bit (
+    input clk,
+    output reg [7:0] fib
 );
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+// Trabajar desde aquí
+reg [7:0] prev;      // almacena el número anterior
 
-  // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+initial begin
+    prev = 8'd1;     // primer anterior (F(-1) imaginario para generar F(0)=0 y F(1)=1)
+    fib  = 8'd0;     // primer número de la serie
+end
 
+always @(posedge clk) begin
+    prev <= fib;          // el anterior pasa a ser el actual actual
+    fib  <= prev + fib;   // nuevo actual = anterior_anterior + actual_anterior
+end
+// Hasta aquí, no modificar fuera de este segmento
+
+endmodule
+
+
+/* 
+ * Testbench para módulo fibonacci_8bit
+*/
+module main;
+  // Señales del testbench
+  reg clk;
+  wire [7:0] fib;
+
+  // Instancia del DUT (Device Under Test)
+  fibonacci_8bit uut (
+      .clk(clk),
+      .fib(fib)
+  );
+
+  // Generación de clock (periodo = 10 unidades)
+  initial begin
+      clk = 0;
+      forever #5 clk = ~clk;
+  end
+
+  // Simulación
+  initial begin
+      $display("fib");
+      $monitor("%d", fib);
+
+      // correr simulación un tiempo
+      #140;
+
+      $display("Fin simulacion");
+      $finish;
+  end
 endmodule
