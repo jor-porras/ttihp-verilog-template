@@ -1,4 +1,4 @@
-module fibonacci (
+module tt_um_fibonacci (
     input clk,
     output reg [7:0] fib
 );
