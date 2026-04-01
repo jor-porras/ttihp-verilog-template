@@ -8,10 +8,13 @@ You can also include images in this folder and reference them in the markdown. E
 -->
 
 ## How it works
+realizaremos la serie de fibonacci mediante registros con una memoria de 8 bits mediante un clk considerando solamente los puntos de subida
 
 Explain how your project works
 
 ## How to test
+
+en terminal del verilog podemos obtener el resultado al runear el codigo
 
 Explain how to use your project
 
