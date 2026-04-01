@@ -8,33 +8,30 @@ from cocotb.triggers import ClockCycles
 
 @cocotb.test()
 async def test_project(dut):
-    dut._log.info("Start")
+    dut._log.info("Start Fibonacci test")
 
-    # Set the clock period to 10 us (100 KHz)
+    # Clock: 100 kHz (10 us period)
     clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
 
-    # Reset
-    dut._log.info("Reset")
+    # Inicialización
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
+
+    # Reset activo en bajo
+    dut._log.info("Applying reset")
     dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
+    await ClockCycles(dut.clk, 2)
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
+    dut._log.info("Checking Fibonacci sequence")
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    # Secuencia esperada después del reset
+    expected_values = [1, 1, 2, 3, 5, 8, 13, 21]
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
-
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
-
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+    for expected in expected_values:
+        await ClockCycles(dut.clk, 1)
+        actual = int(dut.uo_out.value)
+        dut._log.info(f"Expected: {expected}, Got: {actual}")
+        assert actual == expected, f"Expected {expected}, got {actual}"
